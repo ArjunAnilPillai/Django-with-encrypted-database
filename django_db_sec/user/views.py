@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from random import choice
 from user.helperfunctions import generateFernet, encrypt, decrypt
+from .models import person
 
 # Global key
 key = b"7ZGS7-c5EdesRwUUkCfHxIJyVMbAW7rT1Fk6ethFu4c="
@@ -50,6 +51,13 @@ def login(request):
             username = decrypt(localf, username).decode()
             print("After Decryption =", username)
             context["username"] = username
+            curList = []
+            for i in person.objects.all():
+                curName = i.name[2:-1].encode()
+                print(curName)
+                curName = decrypt(globalf, curName).decode()
+                curList.append([i.id, curName])
+            print(curList)
 
             # Rendering
             return render(request, "home.html", context)
@@ -95,6 +103,8 @@ def login(request):
         localf = generateFernet(curKey)
         curKey = encrypt(globalf, curKey)
         username = username.encode()
+        curObj = person(name=encrypt(globalf, username))
+        curObj.save(curObj)
         username = encrypt(localf, username)
         print("Name stored in cookie =", username)
         username = curKey + username
@@ -130,3 +140,59 @@ def logout(request):
 
     # Rendering page
     return response
+
+
+def submitPage(request):
+    global key
+    globalf = generateFernet(key)
+
+    if request.method == "GET":
+        response = render(request, "login.html")
+
+    if request.method == "POST":
+        # Getting username
+        username = request.POST.get("email")
+
+        # Adding name to active users
+        active.append(username)
+
+        # Setting context for rendering
+        print("Submitted =", username)
+        # context = {
+        #     "username": username,
+        #     "login_status": "TRUE",
+        #     "users": ", ".join(active),
+        # }
+        response = render(request, "login.html")
+
+        # Encrypting username and curKey and then appending curKey to username
+        username = username.encode()
+        username = encrypt(globalf, username)
+        curObj = person(name=username)
+        curObj.save(curObj)
+        print("Name stored in database =", username)
+
+        # setting cookies
+        response.set_cookie("username", username)
+        response.set_cookie("logged_in", True)
+        response.set_cookie("timer", True, max_age=1000)
+        return response
+
+
+def displayPage(request):
+    if request.method == "GET":
+        global key
+        globalf = generateFernet(key)
+        print(person.objects.all())
+        curList = []
+        for i in person.objects.all():
+            curName = i.name[2:-1].encode()
+            curName = decrypt(globalf, curName).decode()
+            curList.append(str(i.id) + "\t" + curName)
+        curList = ["ID\tName"] + curList
+        context = {
+            "users": curList,
+        }
+        return render(request, "home.html", context)
+    else:
+        pass

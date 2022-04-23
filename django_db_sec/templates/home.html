@@ -17,16 +17,8 @@
 			class="container justify-content-center mt-5"
 			style="width: fit-content"
 		>
-			{% if username %}
-			<h4>You are logged in as {{username}}</h4>
-			<h4>Login Status: {{login_status}}</h4>
-			<a href="{% url 'logout' %}">logout</a>
-			{% else %}
-			<h4>You are not logged in</h4>
-			<a href="{% url 'login' %}">login</a>
-			{% endif %}
-			<a href="{% url 'login' %}">home</a>
-			<br /><br />{{users}}
+			{% for i in users %} {{i}}<br />
+			{% endfor %}
 		</div>
 	</body>
 </html>

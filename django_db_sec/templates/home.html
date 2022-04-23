@@ -17,7 +17,8 @@
 			class="container justify-content-center mt-5"
 			style="width: fit-content"
 		>
-			{% for i in users %} {{i}}<br />
+			<h1>ID Username<br />Encrypted version</h1>
+			{% for i in users %} {{i.0}}<br />{{i.1}} <br /><br />
 			{% endfor %}
 		</div>
 	</body>

@@ -22,7 +22,7 @@ def submitPage(request):
         username = request.POST.get("email")
 
         # Setting context for rendering
-        print("Submitted =", username)
+        print("Submitted = ", username)
         response = render(request, "submit.html")
 
         # Encrypting username and curKey and then appending curKey to username
@@ -30,7 +30,7 @@ def submitPage(request):
         username = encrypt(globalf, username)
         curObj = person(name=username)
         curObj.save(curObj)
-        print("Name stored in database =", username)
+        print("Name stored in database = ", username)
 
         return response
 
